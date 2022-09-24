@@ -16,3 +16,8 @@ class DrivetrainConstants:
     ENCODER_CPR = 4096
     WHEEL_DIAMETER = 0.1524  # Metres
     ENCODER_DISTANCE_PER_CYCLE = WHEEL_DIAMETER * pi / ENCODER_CPR
+
+
+class ArmConstants:
+    LEFT_MOTOR_PORT = 4
+    RIGHT_MOTOR_PORT = 5

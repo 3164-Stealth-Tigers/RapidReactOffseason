@@ -6,7 +6,7 @@ from pyfrc.physics.core import PhysicsInterface
 from pyfrc.physics.tankmodel import TankModel
 from pyfrc.physics.units import units
 
-from map import DrivetrainConstants
+from map import DrivetrainConstants, ArmConstants
 
 if typing.TYPE_CHECKING:
     from robot import Robot
@@ -16,7 +16,7 @@ class PhysicsEngine:
     def __init__(self, physics_controller: PhysicsInterface, robot: "Robot"):
         self.physics_controller = physics_controller
 
-        # Simulate motors. Tank drive robots generally have 4 or more physical motors, but 2 is acceptable for
+        # Simulate drive motors. Tank drive robots generally have 4 or more physical motors, but 2 is acceptable for
         # simulation purposes because of how the physical motors are chained together
         self.l_motor = wpilib.simulation.PWMSim(
             DrivetrainConstants.FRONT_LEFT_MOTOR_PORT
@@ -53,7 +53,10 @@ class PhysicsEngine:
         self.r_position = r_encoder.getDouble("position")
         self.r_velocity = r_encoder.getDouble("velocity")
 
-        print(wpilib.simulation.SimDeviceSim.enumerateDevices())
+        # Simulate arm motors
+        self.arm_motor = wpilib.simulation.PWMSim(
+            ArmConstants.LEFT_MOTOR_PORT
+        )
 
     def update_sim(self, now, tm_diff):
         # Simulate the drivetrain

@@ -1,6 +1,6 @@
 import wpilib
 
-from subsystems import Drivetrain
+from subsystems import Drivetrain, Arm
 
 
 class RobotContainer:
@@ -9,10 +9,12 @@ class RobotContainer:
         # Subsystems represent self-contained parts of the robot (e.g. the drivetrain, arm, winch)
         # Subsystems expose Commands that can be arranged to make the robot run
         self.drivetrain = Drivetrain()
+        self.arm = Arm()
 
         # Joysticks are plugged into the driver laptop and used during the teleop period to control the robot
         # Each joystick is plugged into a port, ranging from 0 to 5
         self.drive_stick = wpilib.XboxController(0)
+        self.arm_stick = wpilib.XboxController(1)
 
         # Default commands run whenever no other commands are scheduled
         # This included the teleop period, so code for teleop control should be set as the defualt command
@@ -23,5 +25,13 @@ class RobotContainer:
                 # Y sticks report a value of -1 when the stick is pushed all the way up, so invert the value
                 lambda: -self.drive_stick.getLeftY(),
                 self.drive_stick.getRightX,
+            )
+        )
+
+        self.arm.setDefaultCommand(
+            # Control the arm motors' turning power with the left stick on an Xbox controller.
+            # Releasing the joystick causes the arm to slowly fall
+            self.arm.get_default_command(
+                lambda: -self.arm_stick.getLeftY()
             )
         )
