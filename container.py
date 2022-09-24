@@ -1,6 +1,7 @@
+import commands2.button
 import wpilib
 
-from subsystems import Drivetrain, Arm
+from subsystems import Drivetrain, Arm, Winch
 
 
 class RobotContainer:
@@ -10,6 +11,7 @@ class RobotContainer:
         # Subsystems expose Commands that can be arranged to make the robot run
         self.drivetrain = Drivetrain()
         self.arm = Arm()
+        self.winch = Winch()
 
         # Joysticks are plugged into the driver laptop and used during the teleop period to control the robot
         # Each joystick is plugged into a port, ranging from 0 to 5
@@ -31,7 +33,21 @@ class RobotContainer:
         self.arm.setDefaultCommand(
             # Control the arm motors' turning power with the left stick on an Xbox controller.
             # Releasing the joystick causes the arm to slowly fall
-            self.arm.get_default_command(
-                lambda: -self.arm_stick.getLeftY()
-            )
+            self.arm.get_default_command(lambda: -self.arm_stick.getLeftY())
+        )
+
+        # Bind buttons to Commands
+        self.configure_button_bindings()
+
+    def configure_button_bindings(self):
+        """Bind buttons on the Xbox controllers to run Commands"""
+
+        # Wind the winch while holding "up" on the d-pad
+        commands2.button.POVButton(self.arm_stick, angle=0, povNumber=0).whenHeld(
+            self.winch.get_wind_command()
+        )
+
+        # Unwind the winch while holding "down" on the d-pad
+        commands2.button.POVButton(self.arm_stick, angle=180, povNumber=0).whenHeld(
+            self.winch.get_unwind_command()
         )

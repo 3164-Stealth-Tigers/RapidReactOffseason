@@ -21,3 +21,9 @@ class DrivetrainConstants:
 class ArmConstants:
     LEFT_MOTOR_PORT = 4
     RIGHT_MOTOR_PORT = 5
+
+
+class WinchConstants:
+    MOTOR_PORT = 6
+
+    INVERTED = True
