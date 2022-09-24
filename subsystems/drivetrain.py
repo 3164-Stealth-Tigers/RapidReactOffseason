@@ -1,3 +1,5 @@
+from typing import Callable
+
 import commands2
 import ctre
 import wpilib
@@ -30,8 +32,8 @@ class Drivetrain(commands2.SubsystemBase):
         self._drive = wpilib.drive.DifferentialDrive(l_motors, r_motors)
 
         # Encoders report how fast (velocity) and how far (distance) motors are turning.
-        self._l_encoder = ctre.CANCoder(DrivetrainConstants.LEFT_ENCODER_PORT)
-        self._r_encoder = ctre.CANCoder(DrivetrainConstants.RIGHT_ENCODER_PORT)
+        self._l_encoder = ctre.WPI_CANCoder(DrivetrainConstants.LEFT_ENCODER_PORT)
+        self._r_encoder = ctre.WPI_CANCoder(DrivetrainConstants.RIGHT_ENCODER_PORT)
 
         # By multiplying the wheel's circumference by the encoder's CPR (Cycles per Revolution), the wheel's distance travelled can be calculated.
         # CPR is the number of ticks (an arbitrary unit) reported by the encoder in one revolution (360 degrees rotation)
@@ -45,6 +47,43 @@ class Drivetrain(commands2.SubsystemBase):
     # Public methods can be accessed by Commands
 
     def arcade_drive(self, forward: float, rotation: float):
-        self._drive.arcadeDrive(forward, rotation, False)
+        """Drive the robot with joystick controls
 
+        :param forward: Movement along the Y axis. From -1 to 1
+        :param rotation: Movement around the Z axis. From -1 to 1
+        """
+        self._drive.arcadeDrive(forward, rotation, False)
+    
+    def stop(self):
+        """Stop the drive motors"""
+        self._drive.arcadeDrive(0, 0)
+    
+    def zero_encoders(self):
+        """Reset the encoders' recorded position to zero"""
+        self._l_encoder.setPosition(0)
+        self._r_encoder.setPosition(0)
+
+    # Properties report information about the subsystem, usually from sensors
+
+    @property
+    def distance_traveled(self) -> float:
+        """The average distance travelled by the robot's wheels in metres"""
+        return (self._l_encoder.getPosition() + self._r_encoder.getPosition()) / 2
+    
+    # Command factories
+    # When these methods are called, they return a Command that can be scheduled and run
+
+    def get_default_command(self, forward: Callable[[], float], rotation: Callable[[], float]):
+        """A Command that drives the robot with joystick controls
+
+        :param forward: A function that returns a number representing movement along the Y axis, from -1 to 1
+        :param rotation: A function that returns a number representing rotation around the Z axis, from -1 to 1
+        """
+        # Constantly run the forward() and rotation() functions, getting new values from a joystick
+        # Call the arcade_drive() method with these values to make the robot move
+        # After the Command ends (i.e. end of the match), stop the motors
+        return commands2.RunCommand(
+            lambda: self.arcade_drive(forward(), rotation()),
+            [self]
+        ).andThen(self.stop)
     
