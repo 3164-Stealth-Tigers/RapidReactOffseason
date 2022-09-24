@@ -7,6 +7,8 @@ from map import ArmConstants
 
 
 class Arm(commands2.SubsystemBase):
+    """The arm is used for lifting balls into the Low Goal and hooking onto the pull-up bar"""
+
     def __init__(self):
         commands2.SubsystemBase.__init__(self)
 
