@@ -2,8 +2,8 @@ import wpilib
 
 from subsystems import Drivetrain
 
-class RobotContainer:
 
+class RobotContainer:
     def __init__(self):
         """Constructor method"""
         # Subsystems represent self-contained parts of the robot (e.g. the drivetrain, arm, winch)
@@ -22,6 +22,6 @@ class RobotContainer:
             self.drivetrain.get_default_command(
                 # Y sticks report a value of -1 when the stick is pushed all the way up, so invert the value
                 lambda: -self.drive_stick.getLeftY(),
-                self.drive_stick.getRightX
+                self.drive_stick.getRightX,
             )
         )

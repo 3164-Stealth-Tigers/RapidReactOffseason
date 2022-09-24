@@ -1,7 +1,7 @@
 from math import pi
 
-class DrivetrainConstants:
 
+class DrivetrainConstants:
     FRONT_LEFT_MOTOR_PORT = 0
     BACK_LEFT_MOTOR_PORT = 2
     FRONT_RIGHT_MOTOR_PORT = 1
@@ -14,5 +14,5 @@ class DrivetrainConstants:
     RIGHT_ENCODER_PORT = 1
 
     ENCODER_CPR = 4096
-    WHEEL_DIAMETER = 0.1524     # Metres
+    WHEEL_DIAMETER = 0.1524  # Metres
     ENCODER_DISTANCE_PER_CYCLE = WHEEL_DIAMETER * pi / ENCODER_CPR

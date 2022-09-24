@@ -1,6 +1,3 @@
-__all__ = [
-    "drivetrain",
-    "Drivetrain"
-]
+__all__ = ["drivetrain", "Drivetrain"]
 
 from subsystems.drivetrain import Drivetrain
