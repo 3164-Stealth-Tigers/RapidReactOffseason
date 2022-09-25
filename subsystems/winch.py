@@ -37,7 +37,7 @@ class Winch(commands2.SubsystemBase):
         # Run the winch motor at 100% power, then stop the motor when the Command ends
         return commands.InterruptableRunCommand(
             to_run=lambda: self.set_power(1),
-            on_end=lambda: self.set_power(0)
+            on_end=lambda: self.set_power(0),
         )
 
     def get_unwind_command(self):
@@ -45,5 +45,5 @@ class Winch(commands2.SubsystemBase):
         # Run the winch motor backwards at 100% power, then stop the motor when the Command ends
         return commands.InterruptableRunCommand(
             to_run=lambda: self.set_power(-1),
-            on_end=lambda: self.set_power(0)
+            on_end=lambda: self.set_power(0),
         )

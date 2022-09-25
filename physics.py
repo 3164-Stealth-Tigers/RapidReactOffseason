@@ -54,9 +54,7 @@ class PhysicsEngine:
         self.r_velocity = r_encoder.getDouble("velocity")
 
         # Simulate arm motors
-        self.arm_motor = wpilib.simulation.PWMSim(
-            ArmConstants.LEFT_MOTOR_PORT
-        )
+        self.arm_motor = wpilib.simulation.PWMSim(ArmConstants.LEFT_MOTOR_PORT)
 
     def update_sim(self, now, tm_diff):
         # Simulate the drivetrain
