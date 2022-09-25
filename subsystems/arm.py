@@ -68,6 +68,6 @@ class Arm(commands2.SubsystemBase):
             # Apply a small amount of power (0.2%) for 1.75 seconds so that the arm falls slowly.
             # Interrupt slow falling and return control to the user if input is detected.
             commands2.RunCommand(lambda: self.set_power(0.2))
-            .until(input_detected)
-            .withTimeout(1.75),
+            .withTimeout(1.75)
+            .withInterrupt(input_detected),
         ).andThen(lambda: self.set_power(0), [self])
