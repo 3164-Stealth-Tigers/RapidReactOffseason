@@ -1,10 +1,7 @@
-import random
-
 import commands2
 import commands2.button
 import wpilib
 
-from replay import RecordCommand
 from subsystems import Drivetrain, Arm, Winch
 
 
@@ -49,6 +46,9 @@ class RobotContainer:
         self.chooser = wpilib.SendableChooser()
         self.add_autonomous_routines()
 
+        # Put the chooser on Smart Dashboard
+        wpilib.SmartDashboard.putData(self.chooser)
+
     def configure_button_bindings(self):
         """Bind buttons on the Xbox controllers to run Commands"""
 
@@ -67,6 +67,4 @@ class RobotContainer:
 
     def add_autonomous_routines(self):
         """Add routines to the autonomous picker"""
-        self.chooser.setDefaultOption(
-            "record-random", RecordCommand(lambda: str(random.randint(0, 20)))
-        )
+        pass

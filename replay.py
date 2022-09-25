@@ -1,10 +1,12 @@
+__all__ = ["PlaybackCommand", "RecordCommand"]
+
 from datetime import datetime
-import os.path
+from os import PathLike
+from pathlib import Path
 from typing import Callable, Any, List
 
 import commands2
-
-__all__ = ["PlaybackCommand", "RecordCommand"]
+import wpilib
 
 
 class PlaybackCommand(commands2.CommandBase):
@@ -35,13 +37,23 @@ class PlaybackCommand(commands2.CommandBase):
         self.addRequirements(requirements)
 
         # Load each value from the recording file into a list
-        self._steps = parse_file(os.path.abspath(file_path))
+        self._steps = []
+        try:
+            # `.resolve()` changes the user-supplied relative path into an absolute path
+            self._steps = parse_file(Path(file_path).resolve())
+        except FileNotFoundError:
+            wpilib.reportError(f"Recording file not found in PlaybackCommand!")
 
     def initialize(self):
         # Reset the step index. Like rewinding a video to the start
         self._index = 0
 
     def execute(self):
+        # If there aren't any instructions in the list, don't execute.
+        # A non-existent or empty file could lead to there being no steps in the list
+        if not self._steps:
+            return
+
         # Run the Callable and pass the current step as the first argument
         self._to_run(self._steps[self._index])
 
@@ -51,7 +63,7 @@ class PlaybackCommand(commands2.CommandBase):
     def isFinished(self) -> bool:
         # The Command is finished executing if all the steps have been "used up"
         # (i.e. the recording has reached its end)
-        return self._index >= len(self._steps) - 1
+        return self._index >= len(self._steps)
 
 
 class RecordCommand(commands2.CommandBase):
@@ -82,16 +94,21 @@ class RecordCommand(commands2.CommandBase):
         self._steps.append(value)
 
     def end(self, interrupted: bool):
-        # Generate a path using the current date and time
-        path = os.path.abspath(
-            f"recordings/{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
-        )
+        # The folder where recording files should be saved
+        # `.resolve()` changes a relative path into an absolute path
+        path = Path("./recordings").resolve()
+
+        # Create the folder if it doesn't exist
+        path.mkdir(exist_ok=True)
+
+        # Generate a filename based on the current time
+        filename = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".txt"
 
         # Save the values to a file
-        save_to_file(path, self._steps)
+        save_to_file(path / filename, self._steps)
 
 
-def parse_file(path: str) -> List[str]:
+def parse_file(path: PathLike) -> List[str]:
     """Parse a newline-seperated file into a list of values
 
     :param path: Absolute path to the file
@@ -108,13 +125,16 @@ def parse_file(path: str) -> List[str]:
         return values
 
 
-def save_to_file(path: str, values: List[str]):
+def save_to_file(path: PathLike, values: List[str]):
     """Write a list of values to a file
 
     :param path: Absolute path to the file
     :param values: The values to write
     """
+    # Join each value together into a newline-seperated string
+    text = "\n".join(values)
+
     # Open the file in 'write text' mode as a variable `f`
     with open(path, "wt") as f:
-        # Write each value to a file as its own line
-        f.writelines(values)
+        # Write the string to a file
+        f.write(text)
