@@ -1,6 +1,10 @@
+import random
+
+import commands2
 import commands2.button
 import wpilib
 
+from replay import RecordCommand
 from subsystems import Drivetrain, Arm, Winch
 
 
@@ -39,6 +43,12 @@ class RobotContainer:
         # Bind buttons to Commands
         self.configure_button_bindings()
 
+        # Autonomous chooser component
+        # Adds a dropdown menu to the Driver Station that allows users to pick which autonomous routine (Command group)
+        # to run
+        self.chooser = wpilib.SendableChooser()
+        self.add_autonomous_routines()
+
     def configure_button_bindings(self):
         """Bind buttons on the Xbox controllers to run Commands"""
 
@@ -50,4 +60,13 @@ class RobotContainer:
         # Unwind the winch while holding "down" on the d-pad
         commands2.button.POVButton(self.arm_stick, angle=180, povNumber=0).whenHeld(
             self.winch.get_unwind_command()
+        )
+
+    def get_autonomous_command(self) -> commands2.Command:
+        return self.chooser.getSelected()
+
+    def add_autonomous_routines(self):
+        """Add routines to the autonomous picker"""
+        self.chooser.setDefaultOption(
+            "record-random", RecordCommand(lambda: str(random.randint(0, 20)))
         )

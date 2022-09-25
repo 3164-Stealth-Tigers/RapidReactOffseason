@@ -1,11 +1,16 @@
+from datetime import datetime
 import os.path
 from typing import Callable, Any, List
 
 import commands2
 
+__all__ = ["PlaybackCommand", "RecordCommand"]
+
 
 class PlaybackCommand(commands2.CommandBase):
-    """Streams a list of values from a file into a function, just like using an action replay for a video game"""
+    """A Command that iterates over values in a file and calls a function with each iteration. Useful for recording
+    and replaying autonomous routines. The Command finishes when the last value has been iterated over
+    """
 
     # The number of iterations the command has gone through. Used to play the correct step in the recording
     _index = 0
@@ -33,26 +38,57 @@ class PlaybackCommand(commands2.CommandBase):
         self._steps = parse_file(os.path.abspath(file_path))
 
     def initialize(self):
-        # Reset the step index, so that the replay starts at the beginning each time the Command is scheduled
+        # Reset the step index. Like rewinding a video to the start
         self._index = 0
 
     def execute(self):
-        # Run the Callable with the next step as an argument
+        # Run the Callable and pass the current step as the first argument
         self._to_run(self._steps[self._index])
 
-        # Increment the step count
+        # Increment the step count. Like hitting "play" on a video
         self._index += 1
 
     def isFinished(self) -> bool:
         # The Command is finished executing if all the steps have been "used up"
+        # (i.e. the recording has reached its end)
         return self._index >= len(self._steps) - 1
 
 
 class RecordCommand(commands2.CommandBase):
-    """Records a list of values into a file. The file can be played back using a `PlaybackCommand`"""
+    """A Command that records a set of values returned by a Callable.
+    These values can be played back using a `PlaybackCommand`
+    """
 
-    def __init__(self):
+    # A list of ordered values to save to the file
+    _steps = []
+
+    def __init__(self, provider: Callable[[], str]):
+        """Construct a `RecordCommand`
+
+        :param provider: A Callable that returns a value when called. Each value will be recorded into a file
+        """
         commands2.CommandBase.__init__(self)
+        self._provider = provider
+
+    def initialize(self):
+        # Clear the list of recorded values
+        self._steps = []
+
+    def execute(self):
+        # Call the provider function and obtain a value
+        value = self._provider()
+
+        # Add the value to the end of a list so that it will be saved when the Command ends
+        self._steps.append(value)
+
+    def end(self, interrupted: bool):
+        # Generate a path using the current date and time
+        path = os.path.abspath(
+            f"recordings/{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
+        )
+
+        # Save the values to a file
+        save_to_file(path, self._steps)
 
 
 def parse_file(path: str) -> List[str]:
@@ -60,7 +96,7 @@ def parse_file(path: str) -> List[str]:
 
     :param path: Absolute path to the file
     """
-    # Open the file in 'read text' mode and store it as a variable `f`
+    # Open the file in 'read text' mode as a variable `f`
     with open(path, "rt") as f:
         # Read each line and the values into a list.
         # Remove the newline character from the end of each value
@@ -70,3 +106,15 @@ def parse_file(path: str) -> List[str]:
         values = [v for v in values if v != ""]
 
         return values
+
+
+def save_to_file(path: str, values: List[str]):
+    """Write a list of values to a file
+
+    :param path: Absolute path to the file
+    :param values: The values to write
+    """
+    # Open the file in 'write text' mode as a variable `f`
+    with open(path, "wt") as f:
+        # Write each value to a file as its own line
+        f.writelines(values)
