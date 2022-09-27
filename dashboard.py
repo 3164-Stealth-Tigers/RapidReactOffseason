@@ -28,14 +28,14 @@ class _TypedProvider:
 
 # A dictionary of provider Callables, each with its own unique "key."
 # The key doubles as the value name in Smart Dashboard
-providers: Dict[str, _TypedProvider] = dict()
+_providers: Dict[str, _TypedProvider] = dict()
 
 
 def update_dashboard():
     """Query each key-value pair assigned to the dashboard and publish new values.
     Run periodically (every robot loop)
     """
-    for key, value in providers.items():
+    for key, value in _providers.items():
         # Different types need different methods to be added to Smart Dashboard.
         # Using the value type as an index, choose the correct methods from a dictionary.
         # This works because functions are considered objects in Python, and therefore can be stored as values in dicts
@@ -53,7 +53,7 @@ def update_dashboard():
 
 
 def _add_value(key: str, provider: Callable[[], Any], value_type: _ValueType):
-    providers[key] = _TypedProvider(provider, value_type)
+    _providers[key] = _TypedProvider(provider, value_type)
 
 
 def add_number(key: str, provider: Callable[[], float]):
@@ -116,7 +116,7 @@ def delete_value(key: str):
     :param key: The unique name of the value to delete
     """
     # Remove the value from the dictionary. `del` actually removes the value, rather than just setting it to None
-    del providers[key]
+    del _providers[key]
 
     # Remove the value from Smart Dashboard
     wpilib.SmartDashboard.delete(key)
