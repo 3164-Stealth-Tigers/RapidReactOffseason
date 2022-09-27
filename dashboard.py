@@ -6,7 +6,7 @@ using a provider method for each value.
 
 import enum
 from dataclasses import dataclass
-from typing import Callable, List, Any, Set
+from typing import Callable, List, Any, Dict
 
 import wpilib
 
@@ -21,25 +21,21 @@ class _ValueType(enum.Enum):
 
 
 @dataclass
-class _KeyValuePair:
-    key: str
-    value: Callable
+class _TypedProvider:
+    provider: Callable
     value_type: _ValueType
 
-    def __hash__(self):
-        # A method used for determining whether a `_KeyValuePair` is identical to another inside a `set`
-        return hash(self.key)
 
-
-# A list of key-value pairs to query and publish to SmartDashboard
-key_pairs: Set[_KeyValuePair] = set()
+# A dictionary of provider Callables, each with its own unique "key."
+# The key doubles as the value name in Smart Dashboard
+providers: Dict[str, _TypedProvider] = dict()
 
 
 def update_dashboard():
     """Query each key-value pair assigned to the dashboard and publish new values.
     Run periodically (every robot loop)
     """
-    for pair in key_pairs:
+    for key, value in providers.items():
         # Different types need different methods to be added to Smart Dashboard.
         # Using the value type as an index, choose the correct methods from a dictionary.
         # This works because functions are considered objects in Python, and therefore can be stored as values in dicts
@@ -50,14 +46,14 @@ def update_dashboard():
             _ValueType.NUMBER_ARRAY: wpilib.SmartDashboard.putNumberArray,
             _ValueType.STRING_ARRAY: wpilib.SmartDashboard.putStringArray,
             _ValueType.BOOLEAN_ARRAY: wpilib.SmartDashboard.putBooleanArray,
-        }[pair.value_type]
+        }[value.value_type]
 
         # Call the method to add the value to Smart Dashboard
-        method(pair.key, pair.value())
+        method(key, value.provider())
 
 
 def _add_value(key: str, provider: Callable[[], Any], value_type: _ValueType):
-    key_pairs.add(_KeyValuePair(key, provider, value_type))
+    providers[key] = _TypedProvider(provider, value_type)
 
 
 def add_number(key: str, provider: Callable[[], float]):
@@ -112,3 +108,15 @@ def add_boolean_array(key: str, provider: Callable[[], List[bool]]):
     :param provider: Function that provides an up-to-date value every time the dashboard is updated
     """
     _add_value(key, provider, _ValueType.BOOLEAN_ARRAY)
+
+
+def delete_value(key: str):
+    """Removes a value from Smart Dashboard and prevents it from automatically updating
+
+    :param key: The unique name of the value to delete
+    """
+    # Remove the value from the dictionary. `del` actually removes the value, rather than just setting it to None
+    del providers[key]
+
+    # Remove the value from Smart Dashboard
+    wpilib.SmartDashboard.delete(key)
