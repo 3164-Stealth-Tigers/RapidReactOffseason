@@ -5,6 +5,7 @@ import ctre
 import wpilib
 import wpilib.drive
 
+import dashboard
 from map import DrivetrainConstants
 
 
@@ -56,6 +57,11 @@ class Drivetrain(commands2.SubsystemBase):
         # Encoders need to be inverted according to motor inversion
         self._l_encoder.configSensorDirection(DrivetrainConstants.LEFT_SIDE_INVERTED)
         self._r_encoder.configSensorDirection(DrivetrainConstants.RIGHT_SIDE_INVERTED)
+
+        # Add subsystem info to Smart Dashboard
+        dashboard.add_number("Average Distance", lambda: self.distance_traveled)
+        dashboard.add_number("Left Velocity", self._l_encoder.getVelocity)
+        dashboard.add_number("Right Velocity", self._r_encoder.getVelocity)
 
     # Public methods can be accessed by Commands
 

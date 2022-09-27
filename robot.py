@@ -3,6 +3,7 @@ import typing
 import commands2
 import wpilib
 
+import dashboard
 from container import RobotContainer
 
 
@@ -25,6 +26,12 @@ class Robot(commands2.TimedCommandRobot):
 
     def testInit(self) -> None:
         self.scheduler.cancelAll()
+
+    def robotPeriodic(self) -> None:
+        commands2.TimedCommandRobot.robotPeriodic(self)
+
+        # Periodically update all registered values on the Smart Dashboard
+        dashboard.update_dashboard()
 
 
 if __name__ == "__main__":
