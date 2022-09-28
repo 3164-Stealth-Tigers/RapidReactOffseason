@@ -34,6 +34,9 @@ minimizing the amount of iteration-by-iteration code that must be written.
 
 ### `robot`
 The module that gets run first. Initializes the `RobotContainer` and `dashboard` module.
+The iteration-by-iteration (periodic) code is also here, but most of the robot logic is handed off to the
+`CommandScheduler`, which is created by subclassing `TimedCommandRobot`.
+The `CommandScheduler` automatically runs Subsystem and Command code.
 
 ### `container`
 Contains the `RobotCotainer`. Initializes user input devices (joysticks), Subsystems, and Commands.
