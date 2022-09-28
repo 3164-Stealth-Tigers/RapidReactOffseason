@@ -8,6 +8,9 @@ from subsystems import Drivetrain, Arm, Winch
 class RobotContainer:
     def __init__(self):
         """Constructor method"""
+        # Configure the Driver Station not to report errors when a joystick isn't plugged in
+        wpilib.DriverStation.silenceJoystickConnectionWarning(silence=True)
+
         # Subsystems represent self-contained parts of the robot (e.g. the drivetrain, arm, winch)
         # Subsystems expose Commands that can be arranged to make the robot run
         self.drivetrain = Drivetrain()
@@ -20,7 +23,7 @@ class RobotContainer:
         self.arm_stick = wpilib.XboxController(1)
 
         # Default commands run whenever no other commands are scheduled
-        # This included the teleop period, so code for teleop control should be set as the defualt command
+        # This included the teleop period, so code for teleop control should be set as the default command
         self.drivetrain.setDefaultCommand(
             # Drive the robot forwards and backwards with the left stick on an Xbox controller
             # Turn left and right with the right stick
