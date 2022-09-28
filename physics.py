@@ -8,6 +8,8 @@ from pyfrc.physics.units import units
 
 from map import DrivetrainConstants, ArmConstants
 
+FEET_TO_METRES = 0.3048
+
 if typing.TYPE_CHECKING:
     from robot import Robot
 
@@ -44,12 +46,16 @@ class PhysicsEngine:
         )
 
         # Simulated encoders
-        # Each encoder is represented by a name and index, here `CANEncoder:CANCoder[x]`
-        l_encoder = wpilib.simulation.SimDeviceSim("CANEncoder:CANCoder[0]")
+        # Each encoder is represented by a name and index (port number), here `CANEncoder:CANCoder[x]`
+        l_encoder = wpilib.simulation.SimDeviceSim(
+            f"CANEncoder:CANCoder[{DrivetrainConstants.LEFT_ENCODER_PORT}]"
+        )
         self.l_position = l_encoder.getDouble("position")
         self.l_velocity = l_encoder.getDouble("velocity")
 
-        r_encoder = wpilib.simulation.SimDeviceSim("CANEncoder:CANCoder[1]")
+        r_encoder = wpilib.simulation.SimDeviceSim(
+            f"CANEncoder:CANCoder[{DrivetrainConstants.RIGHT_ENCODER_PORT}]"
+        )
         self.r_position = r_encoder.getDouble("position")
         self.r_velocity = r_encoder.getDouble("velocity")
 
@@ -66,7 +72,7 @@ class PhysicsEngine:
         self.physics_controller.move_robot(transform)
 
         # Simulate encoder readings
-        self.l_position.set(self.drivetrain.l_position)
-        self.l_velocity.set(self.drivetrain.l_velocity)
-        self.r_position.set(self.drivetrain.r_position)
-        self.r_velocity.set(self.drivetrain.r_velocity)
+        self.l_position.set(self.drivetrain.l_position * FEET_TO_METRES)
+        self.l_velocity.set(self.drivetrain.l_velocity * FEET_TO_METRES)
+        self.r_position.set(self.drivetrain.r_position * FEET_TO_METRES)
+        self.r_velocity.set(self.drivetrain.r_velocity * FEET_TO_METRES)
