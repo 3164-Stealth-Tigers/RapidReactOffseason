@@ -30,7 +30,7 @@ python -m robot deploy
 
 This codebase is written using the [Command-Based design pattern](https://docs.wpilib.org/en/stable/docs/software/commandbased/what-is-command-based.html).
 Command-based places an emphasis on separating *how* the robot does something from *what* the robot ought to do and
-minimizing the amount of iteration-by-iteration code that must be written.
+minimizes the amount of iteration-by-iteration code that must be written.
 
 ### `robot`
 The module that gets run first. Initializes the `RobotContainer` and `dashboard` module.
@@ -54,7 +54,7 @@ A module containing Subsystems. Each Subsystem has its own module that contains 
 functions or logic specific to it.
 
 ### `physics`
-Defines a simulated robot that matches the real one. Needed for the simulation to run.
+Defines a simulated robot that mirrors the real one. Needed for the simulation to run.
 
 ### `map`
 Robot constants that include ports, speeds, PID values, etc. Anything "magic numbers" should be defined here.
