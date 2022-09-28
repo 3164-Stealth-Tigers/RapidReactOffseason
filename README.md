@@ -36,7 +36,7 @@ minimizing the amount of iteration-by-iteration code that must be written.
 The module that gets run first. Initializes the `RobotContainer` and `dashboard` module.
 
 ### `container`
-Contains the `RobotCotainer`. Initialize user input devices (joysticks), Subsystems, and Commands.
+Contains the `RobotCotainer`. Initializes user input devices (joysticks), Subsystems, and Commands.
 
 
 Subsystems represent physical systems on the robot.
@@ -46,6 +46,10 @@ Each subsystem contains the motors, sensors, and methods needed to interact with
 Commands run code and can be sequenced in different ways (i.e. sequential or parallel).
 Each Subsystem runs a Command by default, and Commands can be strung together to create routines in autonomous.
 
+### `subsystems`
+A module containing Subsystems. Each Subsystem has its own module that contains the Subsystem class and any extra
+functions or logic specific to it.
+
 ### `physics`
 Defines a simulated robot that matches the real one. Needed for the simulation to run.
 
@@ -54,7 +58,7 @@ Robot constants that include ports, speeds, PID values, etc. Anything "magic num
 
 ### `commands`
 Contains abstract Command definitions that can be used in different command groupings.
-Does **not** include Subsystem-specific Commands; those are defined in `subsystems`
+Does **not** include Subsystem-specific Commands; those are defined in `subsystems`.
 
 ### `replay`
 A pair of Commands used to record a stream of values (e.g. joystick inputs or motor speeds) and play them back later.
