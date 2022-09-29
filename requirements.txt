@@ -1,2 +1,3 @@
 robotpy[commands2,ctre]
 black[d]
+pre-commit
