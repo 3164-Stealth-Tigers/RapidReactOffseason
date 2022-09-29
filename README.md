@@ -6,11 +6,18 @@ Designed to run on team 3164's bot and teach new members the basics of code.
 ## Setup
 
 ```bash
+# Install Python dependencies
 pip install -r requirements.txt
+
+# Setup pre-commit hooks
+pre-commit install --install-hooks
 ```
 
 This installs `robotpy` and `black`, the code formatter.
 Check out the [Black docs](https://black.readthedocs.io/en/stable/integrations/editors.html) to integrate with your code editor.
+
+Additionally, it installs pre-commit hooks, which run before every Git commit. The hooks in this repo run `black` and
+automatically fix formatting errors.
 
 ## Development
 
