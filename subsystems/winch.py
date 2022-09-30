@@ -1,7 +1,6 @@
 import commands2
 import wpilib
 
-import commands
 from map import WinchConstants
 
 
@@ -35,15 +34,17 @@ class Winch(commands2.SubsystemBase):
     def get_wind_command(self):
         """A Command that winds the winch up for as long as the Command is running"""
         # Run the winch motor at 100% power, then stop the motor when the Command ends
-        return commands.InterruptableRunCommand(
-            to_run=lambda: self.set_power(1),
-            on_end=lambda: self.set_power(0),
+        return commands2.StartEndCommand(
+            lambda: self.set_power(1),
+            lambda: self.set_power(0),
+            self,
         )
 
     def get_unwind_command(self):
         """A Command that unwinds the winch up for as long as the Command is running"""
         # Run the winch motor backwards at 100% power, then stop the motor when the Command ends
-        return commands.InterruptableRunCommand(
-            to_run=lambda: self.set_power(-1),
-            on_end=lambda: self.set_power(0),
+        return commands2.StartEndCommand(
+            lambda: self.set_power(-1),
+            lambda: self.set_power(0),
+            self,
         )
