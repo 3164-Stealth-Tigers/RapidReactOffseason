@@ -76,3 +76,6 @@ This can be useful for getting quick and dirty autonomous routines up and runnin
 
 ### `dashboard`
 Used to automatically update values on the robot dashboard (i.e. SmartDashboard).
+
+### `oi`
+OI stands for operator input. This module contains control schemes (e.g. Xbox controller, flight stick) for teleop.
