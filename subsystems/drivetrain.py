@@ -6,7 +6,7 @@ import wpilib
 import wpilib.drive
 
 import dashboard
-from map import DrivetrainConstants
+from map import DrivetrainConstants, DriveProfile
 
 
 class Drivetrain(commands2.SubsystemBase):
@@ -93,16 +93,46 @@ class Drivetrain(commands2.SubsystemBase):
     # When these methods are called, they return a Command that can be scheduled and run
 
     def get_default_command(
-        self, forward: Callable[[], float], rotation: Callable[[], float]
+        self,
+        forward: Callable[[], float],
+        rotation: Callable[[], float],
+        mod: Callable[[], bool],
     ):
         """A Command that drives the robot with joystick controls
 
         :param forward: A function that returns a number representing movement along the Y axis, from -1 to 1
         :param rotation: A function that returns a number representing rotation around the Z axis, from -1 to 1
+        :param mod: A function that returns whether the robot should be slowed down to allow finer control.
         """
-        # Constantly run the forward() and rotation() functions, getting new values from a joystick
+
+        def drive_speed():
+            """The robot's movement along the Y axis."""
+            # If the modifier button isn't pressed, move full speed. If it is pressed, move at a slower speed.
+            # Call the forward() function to get the operator's joystick input, then multiply it by the full or slow
+            # speed modifier.
+            # fmt: off
+            return forward() * (
+                DriveProfile.FULL_DRIVE_SPEED
+                if not mod()
+                else DriveProfile.MOD_DRIVE_SPEED
+            )
+            # fmt: on
+
+        def turn_speed():
+            """The robot's movement around the Z axis."""
+            # If the modifier button isn't pressed, turn full speed. If it is pressed, turn at a slower speed
+            # fmt: off
+            return rotation() * (
+                DriveProfile.FULL_TURN_SPEED
+                if not mod()
+                else DriveProfile.MOD_TURN_SPEED
+            )
+            # fmt: on
+
+        # Constantly run the drive_speed() and turn_speed() functions, getting new values from a joystick
         # Call the arcade_drive() method with these values to make the robot move
         # After the Command ends (i.e. end of the match), stop the motors
         return commands2.RunCommand(
-            lambda: self.arcade_drive(forward(), rotation()), [self]
+            lambda: self.arcade_drive(drive_speed(), turn_speed()),
+            self,
         ).andThen(self.stop)
