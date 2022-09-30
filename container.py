@@ -31,6 +31,9 @@ class RobotContainer:
                 # Y sticks report a value of -1 when the stick is pushed all the way up, so invert the value
                 lambda: -self.drive_stick.getLeftY(),
                 self.drive_stick.getRightX,
+                # If either the left or right bumper is pressed, drive and turn at a slower speed
+                lambda: self.drive_stick.getLeftBumper()
+                or self.drive_stick.getRightBumper(),
             )
         )
 

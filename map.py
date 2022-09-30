@@ -1,6 +1,16 @@
 from math import pi
 
 
+class DriveProfile:
+    """Information about how the robot should drive (i.e. speeds)"""
+
+    FULL_DRIVE_SPEED = 1
+    MOD_DRIVE_SPEED = 0.5
+
+    FULL_TURN_SPEED = 1
+    MOD_TURN_SPEED = 0.6
+
+
 class DrivetrainConstants:
     FRONT_LEFT_MOTOR_PORT = 2
     BACK_LEFT_MOTOR_PORT = 3
