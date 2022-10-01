@@ -8,6 +8,8 @@ from pyfrc.physics.units import units
 
 from map import DrivetrainConstants, ArmConstants
 
+FEET_TO_METRES = 0.3048
+
 if typing.TYPE_CHECKING:
     from robot import Robot
 
@@ -44,14 +46,8 @@ class PhysicsEngine:
         )
 
         # Simulated encoders
-        # Each encoder is represented by a name and index, here `CANEncoder:CANCoder[x]`
-        l_encoder = wpilib.simulation.SimDeviceSim("CANEncoder:CANCoder[0]")
-        self.l_position = l_encoder.getDouble("position")
-        self.l_velocity = l_encoder.getDouble("velocity")
-
-        r_encoder = wpilib.simulation.SimDeviceSim("CANEncoder:CANCoder[1]")
-        self.r_position = r_encoder.getDouble("position")
-        self.r_velocity = r_encoder.getDouble("velocity")
+        self.l_encoder = robot.container.drivetrain._l_encoder.getSimCollection()
+        self.r_encoder = robot.container.drivetrain._r_encoder.getSimCollection()
 
         # Simulate arm motors
         self.arm_motor = wpilib.simulation.PWMSim(ArmConstants.LEFT_MOTOR_PORT)
@@ -66,7 +62,41 @@ class PhysicsEngine:
         self.physics_controller.move_robot(transform)
 
         # Simulate encoder readings
-        self.l_position.set(self.drivetrain.l_position)
-        self.l_velocity.set(self.drivetrain.l_velocity)
-        self.r_position.set(self.drivetrain.r_position)
-        self.r_velocity.set(self.drivetrain.r_velocity)
+
+        # By setting the "raw position", any user calls to setPosition() are accounted for, and the simulated value
+        # is modified accordingly.
+        # Position needs to be supplied in encoder ticks, so first convert feet to metres, then metres to ticks.
+        # The simulated encoder values are inverted according to whether they're inverted in the robot code.
+        self.l_encoder.setRawPosition(
+            -int(
+                self.drivetrain.l_position
+                * FEET_TO_METRES
+                / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
+            )
+        )
+        self.r_encoder.setRawPosition(
+            int(
+                self.drivetrain.r_position
+                * FEET_TO_METRES
+                / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
+            )
+        )
+
+        # The velocity needs to be supplied in ticks/100ms. The velocity data is originally in feet/s, so change from
+        # feet/s to m/s, then from m/s to ticks/s, then from ticks/s to ticks/100ms.
+        self.l_encoder.setVelocity(
+            -int(
+                self.drivetrain.l_velocity
+                * FEET_TO_METRES
+                / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
+                * 0.1
+            )
+        )
+        self.r_encoder.setVelocity(
+            int(
+                self.drivetrain.r_velocity
+                * FEET_TO_METRES
+                / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
+                * 0.1
+            )
+        )

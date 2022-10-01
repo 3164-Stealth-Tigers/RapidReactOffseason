@@ -62,6 +62,8 @@ class Drivetrain(commands2.SubsystemBase):
         dashboard.add_number("Average Distance", lambda: self.distance_traveled)
         dashboard.add_number("Left Velocity", self._l_encoder.getVelocity)
         dashboard.add_number("Right Velocity", self._r_encoder.getVelocity)
+        dashboard.add_number("Left Position", self._l_encoder.getPosition)
+        dashboard.add_number("Right Position", self._r_encoder.getPosition)
 
     # Public methods can be accessed by Commands
 
