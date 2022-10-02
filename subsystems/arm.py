@@ -1,10 +1,10 @@
 from typing import Callable
-
 import commands2
 import wpilib
 
 from commands import RepeatingCommand
 from map import ArmConstants
+from util import to_voltage
 
 
 class Arm(commands2.SubsystemBase):
@@ -95,3 +95,33 @@ class Arm(commands2.SubsystemBase):
                 .withInterrupt(input_detected),
             ).andThen(lambda: self.set_power(0), [self])
         )
+
+    def get_hold_position_command(self):
+        """A Command that holds the arm at its current height"""
+        return _HoldPositionCommand(self)
+
+
+class _HoldPositionCommand(commands2.CommandBase):
+    """A Command that holds the arm at its current height"""
+
+    _power: float
+
+    def __init__(self, arm: Arm):
+        """Construct a HoldPositionCommand
+
+        :param arm: An instance of the `Arm` subsystem
+        """
+        commands2.CommandBase.__init__(self)
+        self.addRequirements([arm])
+        self._arm = arm
+
+    def initialize(self) -> None:
+        # Convert the current power to a voltage as a reference point. When `set_voltage` is called later, this value
+        # will be converted back into a PWM value while maintaining the same arm height.
+        self._power = to_voltage(self._arm.power)
+
+    def execute(self) -> None:
+        self._arm.set_voltage(self._power)
+
+    def end(self, interrupted: bool) -> None:
+        self._arm.set_power(0)
