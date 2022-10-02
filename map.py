@@ -1,5 +1,12 @@
 from math import pi
 
+from util import FEET_TO_METRES
+
+
+class AutoConstants:
+    DRIVE_AWAY_FROM_HUB_DISTANCE = 7.5 * FEET_TO_METRES
+    DRIVE_AWAY_FROM_HUB_SPEED = -0.5
+
 
 class DriveProfile:
     """Information about how the robot should drive (i.e. speeds)"""
