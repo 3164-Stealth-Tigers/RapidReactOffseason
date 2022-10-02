@@ -73,6 +73,15 @@ class RobotContainer:
 
     def add_autonomous_routines(self):
         """Add routines to the autonomous picker"""
+        # Drive Out of Tarmac auto
+        # Drive backwards out of the tarmac. The Command will end after 4 seconds in case the encoders fail.
+        exit_tarmac_auto = self.drivetrain.get_drive_distance_command(
+            AutoConstants.DRIVE_AWAY_FROM_HUB_DISTANCE,
+            AutoConstants.DRIVE_AWAY_FROM_HUB_SPEED,
+        ).withTimeout(4)
+        # Add the routine to the autonomous chooser
+        self.chooser.addOption("Exit Tarmac", exit_tarmac_auto)
+
         # Old 1-Ball Preloaded auto
         one_ball_auto = commands2.SequentialCommandGroup(
             # Play back a sequence that lifts the arm to the low goal.
@@ -93,7 +102,7 @@ class RobotContainer:
             commands2.RunCommand(lambda: self.arm.set_power(0.2))
             .withTimeout(1.75)
             .andThen(lambda: self.arm.set_power(0)),
-            # Drive out of the tarmac. In case the encoders fail, the Command will end after 4 seconds
+            # Drive out of the tarmac
             self.drivetrain.get_drive_distance_command(
                 AutoConstants.DRIVE_AWAY_FROM_HUB_DISTANCE,
                 AutoConstants.DRIVE_AWAY_FROM_HUB_SPEED,
