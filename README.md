@@ -3,6 +3,21 @@
 A complete re-write of the 2021-2022 season's robot code.
 Designed to run on team 3164's bot and teach new members the basics of code.
 
+## Driving
+
+The robot can be driven with two Xbox controllers. The first controller is the Driver, which drives the robot.
+The second controller is the Operator, which manipulates the arm and winch.
+
+### Driver
+Left Stick Y &#8594; Drive forwards/backwards\
+Right Stick X &#8594; Turn\
+Left Bumper and Right Bumper (Hold) &#8594; Drive slowly
+
+### Operator
+Left Stick Y &#8594; Arm power\
+D-pad Up &#8594; Wind winch\
+D-pad Down &#8594; Unwind winch
+
 ## Autonomous Routines
 
 Auto routines run during the 15 seconds of the robot game. During these 15 seconds, the robot moves without driver control,
@@ -104,6 +119,3 @@ Used to automatically update values on the robot dashboard (i.e. SmartDashboard)
 
 ### `oi`
 OI stands for operator input. This module contains control schemes (e.g. Xbox controller, flight stick) for teleop.
-
-### `util`
-Utility methods and unit conversions used throughout the codebase.
