@@ -2,6 +2,8 @@
 
 import wpilib
 
+FEET_TO_METRES = 0.3048
+
 
 def to_voltage(power: float) -> float:
     """Adjust a PWM value to the robot's current voltage. For example, passing a `power` of 0.5 while the robot is
