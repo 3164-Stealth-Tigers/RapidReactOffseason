@@ -84,12 +84,14 @@ class RobotContainer:
 
         # Old 1-Ball Preloaded auto
         one_ball_auto = commands2.SequentialCommandGroup(
-            # Play back a sequence that lifts the arm to the low goal.
+            # Play back a sequence that lifts the arm to the low goal. The arm initially needs a large amount of power
+            # to get moving, then requires a smaller amount of power to hold at a certain height.
             PlaybackCommand(
                 "resources/1_ball_auto_arm.txt",
                 # Continuously update the arm's power with values from the above file.
                 lambda power: self.arm.set_power(float(power)),
             ),
+            # A ParallelCommandGroup runs both the supplied Commands at the same time.
             commands2.ParallelCommandGroup(
                 # Hold the arm at the low goal.
                 self.arm.get_hold_position_command(),

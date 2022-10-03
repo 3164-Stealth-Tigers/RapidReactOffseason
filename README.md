@@ -3,6 +3,31 @@
 A complete re-write of the 2021-2022 season's robot code.
 Designed to run on team 3164's bot and teach new members the basics of code.
 
+## Autonomous Routines
+
+Auto routines run during the 15 seconds of the robot game. During these 15 seconds, the robot moves without driver control,
+scoring points. Before the match starts, the driver can pick which routine to run using SmartDashboard or Shuffleboard.
+
+
+#### During the `Exit Tarmac` routine, the robot taxis (drives backwards) out of the tarmac, scoring 2 points.
+
+```mermaid
+graph LR
+A{{Auto Begins}} --> B[Taxi out of tarmac]
+```
+
+
+#### During the `1-Ball Preloaded` routine, the robot drops a cargo into the lower goal before taxiing, scoring 4 total points.  
+
+```mermaid
+graph LR
+A{{Auto Begins}} --> B[Lift arm] 
+B --> C[Hold arm at lower hub] & D[Ram into hub]
+C -- 0.5s --> E
+D --> E
+E[Lower arm] -- 1.75s --> F[Exit tarmac]
+```
+
 ## Setup
 
 ```bash
@@ -79,3 +104,6 @@ Used to automatically update values on the robot dashboard (i.e. SmartDashboard)
 
 ### `oi`
 OI stands for operator input. This module contains control schemes (e.g. Xbox controller, flight stick) for teleop.
+
+### `util`
+Utility methods and unit conversions used throughout the codebase.
