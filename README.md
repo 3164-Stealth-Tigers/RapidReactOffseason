@@ -20,7 +20,7 @@ D-pad Down &#8594; Unwind winch
 
 ## Autonomous Routines
 
-Auto routines run during the 15 seconds of the robot game. During these 15 seconds, the robot moves without driver control,
+Auto routines run during the first 15 seconds of the robot game. During these 15 seconds, the robot moves without driver control,
 scoring points. Before the match starts, the driver can pick which routine to run using SmartDashboard or Shuffleboard.
 
 
