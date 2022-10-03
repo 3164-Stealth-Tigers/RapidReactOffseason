@@ -112,5 +112,5 @@ class RobotContainer:
         )
         # This routine requires both the drivetrain and arm subsystems
         one_ball_auto.addRequirements([self.drivetrain, self.arm])
-        # Add the routine to the autonomous chooser
-        self.chooser.addOption("1-Ball Preloaded", one_ball_auto)
+        # Add the routine to the autonomous chooser as the default option
+        self.chooser.setDefaultOption("1-Ball Preloaded", one_ball_auto)
