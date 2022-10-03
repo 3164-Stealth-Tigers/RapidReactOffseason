@@ -92,8 +92,12 @@ class Drivetrain(commands2.SubsystemBase):
 
     @property
     def distance_traveled(self) -> float:
-        """The average distance travelled by the robot's wheels in metres"""
-        return (self._l_encoder.getPosition() + self._r_encoder.getPosition()) / 2
+        """The distance travelled by the robot's left wheel.
+
+        HACK: The right encoder fell off the gearbox, so only the left wheel's position is measured.
+        """
+        # HACK: Right encoder fell off the gearbox; only use left encoder position
+        return self._l_encoder.getPosition()
 
     # Command factories
     # When these methods are called, they return a Command that can be scheduled and run
