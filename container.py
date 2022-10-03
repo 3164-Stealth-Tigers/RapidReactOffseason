@@ -1,7 +1,9 @@
 import commands2.button
 import wpilib
 
+from map import AutoConstants
 from oi import XboxDriver, XboxOperator
+from replay import PlaybackCommand
 from subsystems import Drivetrain, Arm, Winch
 
 
@@ -71,4 +73,44 @@ class RobotContainer:
 
     def add_autonomous_routines(self):
         """Add routines to the autonomous picker"""
-        pass
+        # Drive Out of Tarmac auto
+        # Drive backwards out of the tarmac. The Command will end after 4 seconds in case the encoders fail.
+        exit_tarmac_auto = self.drivetrain.get_drive_distance_command(
+            AutoConstants.DRIVE_AWAY_FROM_HUB_DISTANCE,
+            AutoConstants.DRIVE_AWAY_FROM_HUB_SPEED,
+        ).withTimeout(4)
+        # Add the routine to the autonomous chooser
+        self.chooser.addOption("Exit Tarmac", exit_tarmac_auto)
+
+        # Old 1-Ball Preloaded auto
+        one_ball_auto = commands2.SequentialCommandGroup(
+            # Play back a sequence that lifts the arm to the low goal. The arm initially needs a large amount of power
+            # to get moving, then requires a smaller amount of power to hold at a certain height.
+            PlaybackCommand(
+                "resources/1_ball_auto_arm.txt",
+                # Continuously update the arm's power with values from the above file.
+                lambda power: self.arm.set_power(float(power)),
+            ),
+            # A ParallelCommandGroup runs both the supplied Commands at the same time.
+            commands2.ParallelCommandGroup(
+                # Hold the arm at the low goal.
+                self.arm.get_hold_position_command(),
+                # Ram the robot into the hub
+                commands2.RunCommand(lambda: self.drivetrain.arcade_drive(1, 0)),
+            )
+            # After 0.5 seconds, stop moving the robot
+            .withTimeout(0.5).andThen(lambda: self.drivetrain.arcade_drive(0, 0)),
+            # Slowly drop the arm for 1.75 seconds
+            commands2.RunCommand(lambda: self.arm.set_power(0.2))
+            .withTimeout(1.75)
+            .andThen(lambda: self.arm.set_power(0)),
+            # Drive out of the tarmac
+            self.drivetrain.get_drive_distance_command(
+                AutoConstants.DRIVE_AWAY_FROM_HUB_DISTANCE,
+                AutoConstants.DRIVE_AWAY_FROM_HUB_SPEED,
+            ).withTimeout(4),
+        )
+        # This routine requires both the drivetrain and arm subsystems
+        one_ball_auto.addRequirements([self.drivetrain, self.arm])
+        # Add the routine to the autonomous chooser as the default option
+        self.chooser.setDefaultOption("1-Ball Preloaded", one_ball_auto)

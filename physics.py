@@ -6,9 +6,8 @@ from pyfrc.physics.core import PhysicsInterface
 from pyfrc.physics.tankmodel import TankModel
 from pyfrc.physics.units import units
 
+from util import FEET_TO_METRES
 from map import DrivetrainConstants, ArmConstants
-
-FEET_TO_METRES = 0.3048
 
 if typing.TYPE_CHECKING:
     from robot import Robot

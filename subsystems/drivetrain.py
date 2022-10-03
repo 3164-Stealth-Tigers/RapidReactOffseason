@@ -138,3 +138,44 @@ class Drivetrain(commands2.SubsystemBase):
             lambda: self.arcade_drive(drive_speed(), turn_speed()),
             self,
         ).andThen(self.stop)
+
+    def get_drive_distance_command(self, distance: float, speed: float):
+        """A Command that drives the robot a certain distance using its encoders
+
+        :param distance: The distance the robot should drive in metres. Can be a positive or negative number
+        :param speed: The speed and direction the robot should move, from -1 to 1. A positive number indicates driving
+        """
+        return _DriveDistanceCommand(distance, speed, self)
+
+
+class _DriveDistanceCommand(commands2.CommandBase):
+    """A Command that drives the robot a certain distance using its encoders"""
+
+    def __init__(self, distance: float, speed: float, drivetrain: Drivetrain):
+        """Construct a DriveDistanceCommand
+
+        :param distance: The distance the robot should drive in metres. Can be a positive or negative number
+        :param speed: The speed and direction the robot should move, from -1 to 1. A positive number indicates driving
+        forwards and a negative number indicates driving backwards.
+        :param drivetrain: An instance of the `Drivetrain` subsystem
+        """
+        commands2.CommandBase.__init__(self)
+        self._goal = abs(distance)
+        self._speed = speed
+        self._drivetrain = drivetrain
+
+    def initialize(self) -> None:
+        # Reset the measured encoder distance
+        self._drivetrain.zero_encoders()
+
+    def execute(self) -> None:
+        self._drivetrain.arcade_drive(self._speed, 0)
+
+    def end(self, interrupted: bool) -> None:
+        # Stop moving the robot
+        self._drivetrain.stop()
+
+    def isFinished(self) -> bool:
+        # The Command is finished when the amount of distance traveled by the robot is greater than or equal to
+        # the goal distance
+        return abs(self._drivetrain.distance_traveled) >= self._goal

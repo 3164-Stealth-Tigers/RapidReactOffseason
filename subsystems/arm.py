@@ -1,9 +1,10 @@
 from typing import Callable
-
 import commands2
 import wpilib
 
+from commands import RepeatingCommand
 from map import ArmConstants
+from util import to_voltage
 
 
 class Arm(commands2.SubsystemBase):
@@ -27,6 +28,27 @@ class Arm(commands2.SubsystemBase):
         :param power: Power applied to the arm motors. From -1 to 1
         """
         self._motors.set(power)
+
+    def set_voltage(self, volts: float):
+        """Power the arm motors, adjusting for battery voltage sag. Useful for when consistency is required, such as
+        during autonomous routines.
+
+        This method changes the supplied `volts` to a PWM value under the hood by dividing by the current battery
+        voltage. If 6 volts are supplied while the battery is running at 12 volts, the resulting PWM value will be 0.5.
+        If the same 6 volts are supplied while the battery is running at 9 volts, the PWM value will be 0.67.
+        This method can not create power out of thin air! For example, a battery running at 9 volts can not supply
+        12 volts.
+
+        :param volts: The voltage to apply to the arm motors. From -12 to 12 (on a 12v nominal battery)
+        """
+        self._motors.setVoltage(volts)
+
+    # Properties
+
+    @property
+    def power(self) -> float:
+        """The power supplied to the arm motors. From -1 to 1"""
+        return self._motors.get()
 
     # Command factories
 
@@ -53,21 +75,53 @@ class Arm(commands2.SubsystemBase):
 
         # Run multiple commands in order.
         # Wait until input is detected, power the arm, drop the arm slowly, then stop the motor.
-        # If this commands is set as a default command, it will repeat forever
-        return commands2.SequentialCommandGroup(
-            # Wait until joystick input is detected
-            commands2.WaitUntilCommand(input_detected),
-            # Power the arm with the joystick input, until the input is close to zero
-            # fmt: off
-            commands2.RunCommand(
-                lambda: self.set_power(power())
-            ).until(
-                lambda: not input_detected()
-            ),
-            # fmt: on
-            # Apply a small amount of power (0.2%) for 1.75 seconds so that the arm falls slowly.
-            # Interrupt slow falling and return control to the user if input is detected.
-            commands2.RunCommand(lambda: self.set_power(0.2))
-            .withTimeout(1.75)
-            .withInterrupt(input_detected),
-        ).andThen(lambda: self.set_power(0), [self])
+        # Repeat this command forever.
+        return RepeatingCommand(
+            commands2.SequentialCommandGroup(
+                # Wait until joystick input is detected
+                commands2.WaitUntilCommand(input_detected),
+                # Power the arm with the joystick input, until the input is close to zero
+                # fmt: off
+                commands2.RunCommand(
+                    lambda: self.set_power(power())
+                ).until(
+                    lambda: not input_detected()
+                ),
+                # fmt: on
+                # Apply a small amount of power (0.2%) for 1.75 seconds so that the arm falls slowly.
+                # Interrupt slow falling and return control to the user if input is detected.
+                commands2.RunCommand(lambda: self.set_power(0.2))
+                .withTimeout(1.75)
+                .withInterrupt(input_detected),
+            ).andThen(lambda: self.set_power(0), [self])
+        )
+
+    def get_hold_position_command(self):
+        """A Command that holds the arm at its current height"""
+        return _HoldPositionCommand(self)
+
+
+class _HoldPositionCommand(commands2.CommandBase):
+    """A Command that holds the arm at its current height"""
+
+    _power: float
+
+    def __init__(self, arm: Arm):
+        """Construct a HoldPositionCommand
+
+        :param arm: An instance of the `Arm` subsystem
+        """
+        commands2.CommandBase.__init__(self)
+        self.addRequirements([arm])
+        self._arm = arm
+
+    def initialize(self) -> None:
+        # Convert the current power to a voltage as a reference point. When `set_voltage` is called later, this value
+        # will be converted back into a PWM value while maintaining the same arm height.
+        self._power = to_voltage(self._arm.power)
+
+    def execute(self) -> None:
+        self._arm.set_voltage(self._power)
+
+    def end(self, interrupted: bool) -> None:
+        self._arm.set_power(0)
