@@ -1,4 +1,4 @@
-import os.path
+from pathlib import Path
 
 import commands2.button
 import wpilib
@@ -90,7 +90,7 @@ class RobotContainer:
             # to get moving, then requires a smaller amount of power to hold at a certain height.
             PlaybackCommand(
                 # The file path relative to this script's folder
-                os.path.dirname(__file__) + "/resources/1_ball_auto_arm.txt",
+                Path(__file__).parent / "resources" / "1_ball_auto_arm.txt",
                 # Continuously update the arm's power with values from the above file.
                 lambda power: self.arm.set_power(float(power)),
             ),
