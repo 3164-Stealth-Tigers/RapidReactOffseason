@@ -28,8 +28,8 @@ class Drivetrain(commands2.SubsystemBase):
 
         # Depending on the mechanical robot configuation, either the left or the right side may
         # need to be inverted (i.e. when positive voltage is applied, a motor turns backwards rather than forwards)
-        l_motors.setInverted(DrivetrainConstants.LEFT_SIDE_INVERTED)
-        r_motors.setInverted(DrivetrainConstants.RIGHT_SIDE_INVERTED)
+        l_motors.setInverted(DrivetrainConstants.LEFT_MOTOR_INVERTED)
+        r_motors.setInverted(DrivetrainConstants.RIGHT_MOTOR_INVERTED)
 
         # The motors are setup in a "differential drive" configuartion.
         # In this config, all the motors on each side of the drivetrain are chained together.
@@ -55,8 +55,12 @@ class Drivetrain(commands2.SubsystemBase):
         )
 
         # Encoders need to be inverted according to motor inversion
-        self._l_encoder.configSensorDirection(DrivetrainConstants.LEFT_SIDE_INVERTED)
-        self._r_encoder.configSensorDirection(DrivetrainConstants.RIGHT_SIDE_INVERTED)
+        self._l_encoder.configSensorDirection(
+            DrivetrainConstants.LEFT_ENCODER_INVERTED,
+        )
+        self._r_encoder.configSensorDirection(
+            DrivetrainConstants.RIGHT_ENCODER_INVERTED,
+        )
 
         # Add subsystem info to Smart Dashboard
         dashboard.add_number("Average Distance", lambda: self.distance_traveled)
