@@ -19,7 +19,7 @@ class PlaybackCommand(commands2.CommandBase):
 
     def __init__(
         self,
-        file_path: str,
+        file_path: PathLike,
         to_run: Callable[[str], Any],
         requirements: List[commands2.Subsystem] = [],
     ):
@@ -36,11 +36,13 @@ class PlaybackCommand(commands2.CommandBase):
         # Add subsystem requirements for this Command
         self.addRequirements(requirements)
 
+        # `.resolve()` changes the user-supplied relative path into an absolute path
+        full_path = Path(file_path).resolve()
+
         # Load each value from the recording file into a list
         self._steps = []
         try:
-            # `.resolve()` changes the user-supplied relative path into an absolute path
-            self._steps = parse_file(Path(file_path).resolve())
+            self._steps = parse_file(full_path)
         except FileNotFoundError:
             wpilib.reportError(f"Recording file not found in PlaybackCommand!")
 
@@ -96,7 +98,8 @@ class RecordCommand(commands2.CommandBase):
     def end(self, interrupted: bool):
         # The folder where recording files should be saved
         # `.resolve()` changes a relative path into an absolute path
-        path = Path("./recordings").resolve()
+        path = Path(__file__).parent / "recordings"
+        path = path.resolve()
 
         # Create the folder if it doesn't exist
         path.mkdir(exist_ok=True)

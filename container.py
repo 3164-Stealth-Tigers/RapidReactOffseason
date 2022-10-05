@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import commands2.button
 import wpilib
 
@@ -87,7 +89,8 @@ class RobotContainer:
             # Play back a sequence that lifts the arm to the low goal. The arm initially needs a large amount of power
             # to get moving, then requires a smaller amount of power to hold at a certain height.
             PlaybackCommand(
-                "resources/1_ball_auto_arm.txt",
+                # The file path relative to this script's folder
+                Path(__file__).parent / "resources" / "1_ball_auto_arm.txt",
                 # Continuously update the arm's power with values from the above file.
                 lambda power: self.arm.set_power(float(power)),
             ),
