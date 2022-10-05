@@ -19,10 +19,13 @@ class DriveProfile:
 
 
 class DrivetrainConstants:
-    FRONT_LEFT_MOTOR_PORT = 2
-    BACK_LEFT_MOTOR_PORT = 3
-    FRONT_RIGHT_MOTOR_PORT = 0
-    BACK_RIGHT_MOTOR_PORT = 1
+    # Motor positions are from the perspective of behind the back of the robot, facing the front.
+    # The back of the robot is the side closest to the electrical board, and the front side
+    # is closest to the arm.
+    FRONT_LEFT_MOTOR_PORT = 0
+    BACK_LEFT_MOTOR_PORT = 1
+    FRONT_RIGHT_MOTOR_PORT = 2
+    BACK_RIGHT_MOTOR_PORT = 3
 
     LEFT_SIDE_INVERTED = True
     RIGHT_SIDE_INVERTED = False
