@@ -53,9 +53,8 @@ class PhysicsEngine:
 
     def update_sim(self, now, tm_diff):
         # Simulate the drivetrain
-        # Invert the speed values to match the behavior of the real robot
-        l_motor = -self.l_motor.getSpeed()
-        r_motor = -self.r_motor.getSpeed()
+        l_motor = self.l_motor.getSpeed()
+        r_motor = self.r_motor.getSpeed()
 
         transform = self.drivetrain.calculate(l_motor, r_motor, tm_diff)
         self.physics_controller.move_robot(transform)
