@@ -3,6 +3,7 @@ __all__ = ["PlaybackCommand", "RecordCommand"]
 from datetime import datetime
 from os import PathLike
 from pathlib import Path
+import os.path
 from typing import Callable, Any, List
 
 import commands2
@@ -96,7 +97,7 @@ class RecordCommand(commands2.CommandBase):
     def end(self, interrupted: bool):
         # The folder where recording files should be saved
         # `.resolve()` changes a relative path into an absolute path
-        path = Path("./recordings").resolve()
+        path = Path(os.path.dirname(__file__) + "/recordings").resolve()
 
         # Create the folder if it doesn't exist
         path.mkdir(exist_ok=True)
