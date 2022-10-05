@@ -55,8 +55,12 @@ class Drivetrain(commands2.SubsystemBase):
         )
 
         # Encoders need to be inverted according to motor inversion
-        self._l_encoder.configSensorDirection(DrivetrainConstants.LEFT_ENCODER_INVERTED)
-        self._r_encoder.configSensorDirection(DrivetrainConstants.RIGHT_ENCODER_INVERTED)
+        self._l_encoder.configSensorDirection(
+            DrivetrainConstants.LEFT_ENCODER_INVERTED,
+        )
+        self._r_encoder.configSensorDirection(
+            DrivetrainConstants.RIGHT_ENCODER_INVERTED,
+        )
 
         # Add subsystem info to Smart Dashboard
         dashboard.add_number("Average Distance", lambda: self.distance_traveled)
