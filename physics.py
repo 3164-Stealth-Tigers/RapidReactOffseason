@@ -66,14 +66,14 @@ class PhysicsEngine:
         # Position needs to be supplied in encoder ticks, so first convert feet to metres, then metres to ticks.
         # The simulated encoder values are inverted according to whether they're inverted in the robot code.
         self.l_encoder.setRawPosition(
-            int(
+            -int(
                 self.drivetrain.l_position
                 * FEET_TO_METRES
                 / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
             )
         )
         self.r_encoder.setRawPosition(
-            -int(
+            int(
                 self.drivetrain.r_position
                 * FEET_TO_METRES
                 / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
@@ -83,7 +83,7 @@ class PhysicsEngine:
         # The velocity needs to be supplied in ticks/100ms. The velocity data is originally in feet/s, so change from
         # feet/s to m/s, then from m/s to ticks/s, then from ticks/s to ticks/100ms.
         self.l_encoder.setVelocity(
-            int(
+            -int(
                 self.drivetrain.l_velocity
                 * FEET_TO_METRES
                 / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
@@ -91,7 +91,7 @@ class PhysicsEngine:
             )
         )
         self.r_encoder.setVelocity(
-            -int(
+            int(
                 self.drivetrain.r_velocity
                 * FEET_TO_METRES
                 / DrivetrainConstants.ENCODER_DISTANCE_PER_CYCLE
