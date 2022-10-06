@@ -61,6 +61,9 @@ class RobotContainer:
         # Put the chooser on Smart Dashboard
         wpilib.SmartDashboard.putData(self.chooser)
 
+        # Enable the camera feed
+        wpilib.CameraServer.launch()
+
     def configure_button_bindings(self):
         """Bind buttons on the Xbox controllers to run Commands"""
 
