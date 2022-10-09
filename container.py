@@ -83,7 +83,7 @@ class RobotContainer:
         exit_tarmac_auto = self.drivetrain.get_drive_distance_command(
             AutoConstants.DRIVE_AWAY_FROM_HUB_DISTANCE,
             AutoConstants.DRIVE_AWAY_FROM_HUB_SPEED,
-        ).withTimeout(4)
+        ).withTimeout(3)
         # Add the routine to the autonomous chooser
         self.chooser.addOption("Exit Tarmac", exit_tarmac_auto)
 
@@ -114,7 +114,7 @@ class RobotContainer:
             self.drivetrain.get_drive_distance_command(
                 AutoConstants.DRIVE_AWAY_FROM_HUB_DISTANCE,
                 AutoConstants.DRIVE_AWAY_FROM_HUB_SPEED,
-            ).withTimeout(4),
+            ).withTimeout(3),
         )
         # This routine requires both the drivetrain and arm subsystems
         one_ball_auto.addRequirements([self.drivetrain, self.arm])
